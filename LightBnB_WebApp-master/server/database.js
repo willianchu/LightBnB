@@ -13,7 +13,7 @@ const pool = new Pool({
 console.log("pool");
 pool
   .query(`
-  SELECT * FROM users ORDER BY id DESC LIMIT 3;
+  SELECT * FROM users ORDER BY id ASC LIMIT 5;
   `)
   .then((result) => console.log(result.rows))
   .catch((err) => {
@@ -92,8 +92,7 @@ const addUser =  function(user) {
   const userId = Object.keys(users).length + 1;
   user.id = userId;
   users[userId] = user;
-  //console.log("adding this user", user);
-  //console.log([user.name, user.email, user.password])
+  
   return pool
     .query(`
     INSERT INTO users (name, email, password)
@@ -113,7 +112,16 @@ exports.addUser = addUser;
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
+  return pool
+    .query(`SELECT *
+            FROM reservations
+            WHERE guest_id = $1 AND start_date >= now()::date AND end_date >= now()::date
+            LIMIT 10;
+            `, [guest_id])
+    .then((result) => result.rows)
+    .catch((err) => {
+      console.log('Error retrieving all properties', err.message);
+    });
 };
 exports.getAllReservations = getAllReservations;
 
@@ -126,7 +134,6 @@ exports.getAllReservations = getAllReservations;
  * @return {Promise<[{}]>}  A promise to the properties.
  */
 const getAllProperties = (options, limit = 10) => {
-  //console.log('getAllProperties-', options);
   return pool
     .query(`SELECT * FROM properties LIMIT $1`, [limit])
     .then((result) => result.rows)
