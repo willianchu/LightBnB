@@ -1,14 +1,7 @@
 const database = require('./database');
 const apiRoutes = require('./apiRoutes');
 const userRoutes = require('./userRoutes');
-const { Pool } = require('pg');
 
-const pool = new Pool({
-  user: 'labber',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-});
 
 const path = require('path');
 
@@ -42,5 +35,5 @@ app.get("/test", (req, res) => {
   res.send("🤗");
 });
 
-const port = process.env.PORT || 3000; 
+const port = process.env.PORT || 3000;
 app.listen(port, (err) => console.log(err || `listening on port ${port} 😎`));
